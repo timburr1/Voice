@@ -26,6 +26,7 @@ import voice.core.featureflag.FeatureFlag
 import voice.core.kioskmode.KioskModeDemoData
 import voice.core.kioskmode.KioskModeFeatureFlag
 import voice.core.playback.AutoRewindAmountStore
+import voice.core.playback.LastPlaybackSpeedStore
 import voice.core.playback.LockScreenSliderStore
 import voice.core.playback.SeekTimeStore
 import voice.core.sleeptimer.SleepTimerPreference
@@ -56,6 +57,7 @@ class SettingsViewModel(
   private val coverColorsStore: CoverColorsStore,
   private val autoRewindAmountStore: AutoRewindAmountStore,
   private val seekTimeStore: SeekTimeStore,
+  private val defaultSpeedStore: LastPlaybackSpeedStore,
   private val lockScreenSliderStore: LockScreenSliderStore,
   private val navigator: Navigator,
   private val appInfoProvider: AppInfoProvider,
@@ -92,6 +94,7 @@ class SettingsViewModel(
     val coverColors = remember { coverColorsStore.data }.collectAsState(initial = null).value
     val autoRewindAmount = remember { autoRewindAmountStore.data }.collectAsState(initial = null).value
     val seekTime = remember { seekTimeStore.data }.collectAsState(initial = null).value
+    val defaultSpeed = remember { defaultSpeedStore.data }.collectAsState(initial = null).value
     val lockScreenSlider = remember { lockScreenSliderStore.data }.collectAsState(initial = null).value
     val gridMode = remember { gridModeStore.data }.collectAsState(initial = null).value
     val autoSleepTimer = remember { sleepTimerPreferenceStore.data }.collectAsState(initial = null).value
@@ -117,6 +120,7 @@ class SettingsViewModel(
       coverColors == null ||
       autoRewindAmount == null ||
       seekTime == null ||
+      defaultSpeed == null ||
       lockScreenSlider == null ||
       gridMode == null ||
       autoSleepTimer == null ||
@@ -139,6 +143,7 @@ class SettingsViewModel(
       dynamicColorAvailable = dynamicColorAvailable,
       seekTimeInSeconds = seekTime,
       autoRewindInSeconds = autoRewindAmount,
+      defaultSpeed = defaultSpeed,
       lockScreenSlider = lockScreenSlider,
       appVersion = appInfoProvider.versionName,
       useGrid = when (gridMode) {
@@ -249,6 +254,12 @@ class SettingsViewModel(
     }
   }
 
+  override fun defaultSpeedChanged(speed: Float) {
+    mainScope.launch {
+      defaultSpeedStore.updateData { speed.coerceIn(DEFAULT_SPEED_RANGE) }
+    }
+  }
+
   override fun toggleLockScreenSlider() {
     mainScope.launch {
       lockScreenSliderStore.updateData { !it }
@@ -340,3 +351,4 @@ class SettingsViewModel(
 
 internal val SEEK_TIME_RANGE = 3..60
 internal val AUTO_REWIND_RANGE = 0..20
+internal val DEFAULT_SPEED_RANGE = 0.5F..3.5F

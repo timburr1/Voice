@@ -260,7 +260,6 @@ class VoicePlayer(
     if (playWhenReady) {
       analytics.event("play", mapOf("volume_boost" to if (volumeGain.gain > Decibel.Zero) "on" else "off"))
       updateLastPlayedAt()
-      rememberSpeed(playbackParameters.speed)
     } else {
       analytics.event("pause")
     }
@@ -373,16 +372,6 @@ class VoicePlayer(
     super.setPlaybackSpeed(speed)
     scope.launch {
       updateBook { it.copy(playbackSpeed = speed) }
-    }
-    rememberSpeed(speed)
-  }
-
-  /**
-   * Books that were never played start at this speed, see [withDefaultSpeed].
-   */
-  private fun rememberSpeed(speed: Float) {
-    scope.launch {
-      lastPlaybackSpeedStore.updateData { speed }
     }
   }
 

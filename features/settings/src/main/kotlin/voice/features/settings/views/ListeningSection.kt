@@ -37,11 +37,14 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -80,23 +83,29 @@ import voice.core.ui.ShapedIcon
 import voice.core.ui.icons.VoiceIcons
 import voice.core.ui.rememberAnimationClock
 import voice.features.settings.AUTO_REWIND_RANGE
+import voice.features.settings.DEFAULT_SPEED_RANGE
 import voice.features.settings.SEEK_TIME_RANGE
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import kotlin.math.PI
+import kotlin.math.roundToInt
 import kotlin.math.sin
 import voice.core.strings.R as StringsR
 
 private val SEEK_TIME_PRESETS = listOf(10, 15, 20, 30, 60)
 private val AUTO_REWIND_PRESETS = listOf(0, 2, 5, 10, 20)
+private const val DEFAULT_SPEED_STEP = 0.05F
 
 @Composable
 internal fun ListeningSection(
   seekTimeInSeconds: Int,
   autoRewindInSeconds: Int,
+  defaultSpeed: Float,
   onSeekTimeChange: (Int) -> Unit,
   onSeekTimeStep: (Int) -> Unit,
   onAutoRewindChange: (Int) -> Unit,
   onAutoRewindStep: (Int) -> Unit,
+  onDefaultSpeedChange: (Float) -> Unit,
   lockScreenSlider: Boolean,
   onLockScreenSliderToggle: () -> Unit,
   modifier: Modifier = Modifier,
@@ -126,6 +135,11 @@ internal fun ListeningSection(
       onSecondsChange = onAutoRewindChange,
       onStep = onAutoRewindStep,
       illustration = { RewindIllustration(autoRewindInSeconds, maxSeconds = AUTO_REWIND_RANGE.last) },
+    )
+    Spacer(Modifier.height(28.dp))
+    DefaultSpeedSetting(
+      speed = defaultSpeed,
+      onSpeedChange = onDefaultSpeedChange,
     )
     Spacer(Modifier.height(20.dp))
     IslandSwitchRow(
@@ -212,6 +226,45 @@ private fun SecondsSetting(
       seconds = seconds,
       presets = presets,
       onSecondsChange = onSecondsChange,
+    )
+  }
+}
+
+@Composable
+private fun DefaultSpeedSetting(
+  speed: Float,
+  onSpeedChange: (Float) -> Unit,
+) {
+  val speedFormat = remember { DecimalFormat("0.0#") }
+  Column(modifier = Modifier.padding(horizontal = IslandContentPadding)) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+      Text(
+        modifier = Modifier
+          .weight(1F)
+          .semantics { heading() },
+        text = stringResource(StringsR.string.settings_playback_default_speed_title),
+        style = MaterialTheme.typography.titleMedium,
+      )
+      Text(
+        text = stringResource(StringsR.string.settings_playback_default_speed_value, speedFormat.format(speed)),
+        style = MaterialTheme.typography.titleLargeEmphasized,
+      )
+    }
+    Spacer(Modifier.height(2.dp))
+    Text(
+      text = stringResource(StringsR.string.settings_playback_default_speed_summary),
+      style = MaterialTheme.typography.bodyMedium,
+      color = LocalContentColor.current.copy(alpha = 0.8F),
+    )
+    val sliderState = rememberSliderState(value = speed, trackRange = DEFAULT_SPEED_RANGE)
+    SideEffect { sliderState.value = speed }
+    Slider(
+      state = sliderState,
+      onValueChange = {
+        val snapped = ((it / DEFAULT_SPEED_STEP).roundToInt() * DEFAULT_SPEED_STEP).coerceIn(DEFAULT_SPEED_RANGE)
+        sliderState.value = snapped
+        onSpeedChange(snapped)
+      },
     )
   }
 }

@@ -359,31 +359,7 @@ class VoicePlayerTest {
   }
 
   @Test
-  fun `playing remembers the speed for new books`() = scope.runTest {
-    setMediaItems(
-      listOf(chapter(ChapterMark(startMs = 0, endMs = 20_000, name = null))),
-      playbackSpeed = 1.75F,
-      lastPlayedAt = Instant.ofEpochSecond(1),
-    )
-
-    player.play()
-    runCurrent()
-
-    assertEquals(expected = 1.75F, actual = lastPlaybackSpeedStore.data.first())
-  }
-
-  @Test
-  fun `changing the speed remembers it for new books`() = scope.runTest {
-    setMediaItems(listOf(chapter(ChapterMark(startMs = 0, endMs = 20_000, name = null))))
-
-    player.setPlaybackSpeed(1.25F)
-    runCurrent()
-
-    assertEquals(expected = 1.25F, actual = lastPlaybackSpeedStore.data.first())
-  }
-
-  @Test
-  fun `loading a book does not change the speed for new books`() = scope.runTest {
+  fun `loading a book does not change the default speed`() = scope.runTest {
     setMediaItems(
       listOf(chapter(ChapterMark(startMs = 0, endMs = 20_000, name = null))),
       playbackSpeed = 1.75F,

@@ -35,6 +35,7 @@ import voice.core.featureflag.MemoryFeatureFlag
 import voice.core.kioskmode.KioskModeDemoData
 import voice.core.kioskmode.KioskModeFeatureFlag
 import voice.core.playback.AutoRewindAmountStore
+import voice.core.playback.LastPlaybackSpeedStore
 import voice.core.playback.LockScreenSliderStore
 import voice.core.playback.SeekTimeStore
 import voice.core.sleeptimer.SleepTimerPreference
@@ -73,6 +74,7 @@ class SettingsViewModelTest {
   private val pureBlackStore = MemoryDataStore(false)
   private val coverColorsStore = MemoryDataStore(true)
   private val autoRewindAmountStore = MemoryDataStore(10)
+  private val defaultSpeedStore = MemoryDataStore(1F)
   private val seekTimeStore = MemoryDataStore(30)
   private val lockScreenSliderStore = MemoryDataStore(true)
   private val gridModeStore = MemoryDataStore(GridMode.GRID)
@@ -113,6 +115,7 @@ class SettingsViewModelTest {
     coverColorsStore = CoverColorsStore(coverColorsStore),
     autoRewindAmountStore = AutoRewindAmountStore(autoRewindAmountStore),
     seekTimeStore = SeekTimeStore(seekTimeStore),
+    defaultSpeedStore = LastPlaybackSpeedStore(defaultSpeedStore),
     lockScreenSliderStore = LockScreenSliderStore(lockScreenSliderStore),
     navigator = navigator,
     appInfoProvider = appInfoProvider,
@@ -456,6 +459,17 @@ class SettingsViewModelTest {
     viewModel.autoRewindAmountStepped(-1)
     runCurrent()
     assertEquals(expected = 0, actual = autoRewindAmountStore.data.first())
+  }
+
+  @Test
+  fun `default speed is saved and stays within its range`() = scope.runTest {
+    viewModel.defaultSpeedChanged(1.25F)
+    runCurrent()
+    assertEquals(expected = 1.25F, actual = defaultSpeedStore.data.first())
+
+    viewModel.defaultSpeedChanged(9F)
+    runCurrent()
+    assertEquals(expected = 3.5F, actual = defaultSpeedStore.data.first())
   }
 
   @Test

@@ -15,6 +15,7 @@ interface SettingsListener {
   fun seekAmountStepped(step: Int)
   fun autoRewindAmountChanged(seconds: Int)
   fun autoRewindAmountStepped(step: Int)
+  fun defaultSpeedChanged(speed: Float)
   fun toggleLockScreenSlider()
   fun getSupport()
   fun suggestIdea()
@@ -43,6 +44,7 @@ interface SettingsListener {
       override fun seekAmountStepped(step: Int) {}
       override fun autoRewindAmountChanged(seconds: Int) {}
       override fun autoRewindAmountStepped(step: Int) {}
+      override fun defaultSpeedChanged(speed: Float) {}
       override fun toggleLockScreenSlider() {}
       override fun getSupport() {}
       override fun suggestIdea() {}

@@ -189,10 +189,12 @@ private fun LazyListScope.sections(
       modifier = modifier,
       seekTimeInSeconds = viewState.seekTimeInSeconds,
       autoRewindInSeconds = viewState.autoRewindInSeconds,
+      defaultSpeed = viewState.defaultSpeed,
       onSeekTimeChange = listener::seekAmountChanged,
       onSeekTimeStep = listener::seekAmountStepped,
       onAutoRewindChange = listener::autoRewindAmountChanged,
       onAutoRewindStep = listener::autoRewindAmountStepped,
+      onDefaultSpeedChange = listener::defaultSpeedChanged,
       lockScreenSlider = viewState.lockScreenSlider,
       onLockScreenSliderToggle = listener::toggleLockScreenSlider,
     )

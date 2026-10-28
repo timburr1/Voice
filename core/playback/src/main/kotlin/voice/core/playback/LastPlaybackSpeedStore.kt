@@ -8,7 +8,7 @@ import kotlinx.serialization.builtins.serializer
 import voice.core.datastore.VoiceDataStoreFactory
 
 /**
- * The speed the listener last played at or picked, which a book that was never played starts at.
+ * The default speed picked in the settings, which a book that was never played starts at.
  */
 @SingleIn(AppScope::class)
 class LastPlaybackSpeedStore(store: DataStore<Float>) : DataStore<Float> by store {
